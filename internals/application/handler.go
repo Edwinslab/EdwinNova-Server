@@ -74,6 +74,7 @@ func (h *Handler) CreateApplication(c echo.Context) error {
 
 	proposalURL, err := h.savePDF(proposalFile, "proposals")
 	if err != nil {
+		fmt.Errorf("Error",err)
 		return echo.NewHTTPError(http.StatusInternalServerError, "failed to store proposal pdf")
 	}
 

@@ -2,11 +2,13 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"time"
 
+	"github.com/joho/godotenv"
 	"github.com/labstack/echo"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -15,6 +17,10 @@ import (
 )
 
 func main() {
+	err := godotenv.Load()
+	if err!=nil{
+		log.Println("No .env file found")
+	}
 	mongoURI := getEnv("MONGO_URI", "mongodb+srv://suhas:Fordmustang1969@suhas.cbbha.mongodb.net/EdwinNova")
 	dbName := getEnv("MONGO_DB", "edwinnova")
 	uploadDir := getEnv("UPLOAD_DIR", "./uploads")
@@ -35,6 +41,8 @@ func main() {
 	repo := application.NewRepository(db)
 	svc := application.NewService(repo)
 	handler := application.NewHandler(svc, uploadDir)
+
+	fmt.Println("Mongo url ", os.Getenv("MONGO_URI"))
 
 	e := echo.New()
 

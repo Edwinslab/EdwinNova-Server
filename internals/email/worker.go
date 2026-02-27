@@ -53,6 +53,7 @@ func (w *Worker) Start(ctx context.Context) error {
 		}
 
 		msg.Ack(false)
+		log.Println("Email sent successfully to this user",job.To)
 	}
 
 	return nil

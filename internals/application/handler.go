@@ -205,6 +205,5 @@ func validatePDFHeader(fileHeader *multipart.FileHeader) error {
 	if filepath.Ext(filename) != ".pdf" {
 		return errors.New("file must be a pdf")
 	}
-	// Size checks can be added here if max upload size is enforced.
 	return nil
 }

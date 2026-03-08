@@ -78,7 +78,7 @@ func (h *Handler) CreateApplication(c echo.Context) error {
 
 	proposalURL, err := h.storage.UploadFile(ctx, proposalFile, proposalKey)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "failed to upload proposal", err.Error())
+		return echo.NewHTTPError(http.StatusInternalServerError,"failed to upload proposal", err.Error())
 	}
 
 	/* Upload resumes */

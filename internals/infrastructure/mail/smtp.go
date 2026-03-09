@@ -1,6 +1,7 @@
 package mail
 
 import (
+	"crypto/tls"
 	"fmt"
 	"net/smtp"
 	"os"
@@ -35,25 +36,63 @@ func NewSMTPClient() (*SMTPClient, error) {
 		from: user,
 	}, nil
 }
-
 func (s *SMTPClient) Send(to, subject, body string) error {
 
 	msg := []byte(
 		"Subject: " + subject + "\r\n" +
-			"MIME-version: 1.0;\r\n" +
-			"Content-Type: text/html; charset=\"UTF-8\";\r\n\r\n" +
+			"MIME-version: 1.0\r\n" +
+			"Content-Type: text/html; charset=\"UTF-8\"\r\n\r\n" +
 			body,
 	)
 
-	return smtp.SendMail(
-		s.host+":"+s.port,
-		s.auth,
-		s.from,
-		[]string{to},
-		msg,
-	)
-}
+	server := s.host + ":" + s.port
 
+	tlsconfig := &tls.Config{
+		InsecureSkipVerify: false,
+		ServerName:         s.host,
+	}
+
+	conn, err := tls.Dial("tcp", server, tlsconfig)
+	if err != nil {
+		return err
+	}
+
+	client, err := smtp.NewClient(conn, s.host)
+	if err != nil {
+		return err
+	}
+
+	if err = client.Auth(s.auth); err != nil {
+		return err
+	}
+
+	if err = client.Mail(s.from); err != nil {
+		return err
+	}
+
+	if err = client.Rcpt(to); err != nil {
+		return err
+	}
+
+	w, err := client.Data()
+	if err != nil {
+		return err
+	}
+
+	_, err = w.Write(msg)
+	if err != nil {
+		return err
+	}
+
+	err = w.Close()
+	if err != nil {
+		return err
+	}
+
+	client.Quit()
+
+	return nil
+}
 
 
 func (s *SMTPClient) SendGenericEmail(toEmail, subject, body string) error {

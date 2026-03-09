@@ -49,7 +49,7 @@ func (s *service) CreateApplication(ctx context.Context, app *Application) error
 		return err
 	}
 	log.Printf("Built registration email body for team %s", app.TeamName)
-	err = s.smtp.Send(app.PMEmail,"Your Hackothon registration is successfull",emailBody)
+	err = s.smtp.SendGenericEmail(app.PMEmail,"Your Hackothon registration is successfull",emailBody)
 	if err != nil {
 		log.Printf("Failed to send registration email to %s: %v", app.PMEmail, err)
 		return err

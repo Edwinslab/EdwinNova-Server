@@ -42,7 +42,6 @@ func (s *S3Storage) UploadFile(
 			v := "application/pdf"
 			return &v
 		}(),
-		ACL: "public-read",
 	})
 
 	if err != nil {
@@ -50,14 +49,13 @@ func (s *S3Storage) UploadFile(
 	}
 
 	url := fmt.Sprintf(
-		"https://%s.s3.amazonaws.com/%s",
+		"https://%s.s3.ap-south-1.amazonaws.com/%s",
 		s.BucketName,
 		key,
 	)
 
 	return url, nil
 }
-
 
 func (s *S3Storage) GenerateSignedURL(
 	ctx context.Context,

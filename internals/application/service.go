@@ -10,6 +10,7 @@ import (
 
 type Service interface {
 	CreateApplication(ctx context.Context, app *Application) error
+	GetApplication(ctx context.Context) error
 }
 
 type service struct {
@@ -50,4 +51,12 @@ func (s *service) CreateApplication(ctx context.Context, app *Application) error
 	}
 	log.Printf("Sent registration email to %s for team %s", app.PMEmail, app.TeamName)
 	return nil
+}
+
+func (s *service) GetApplication(ctx context.Context) error {
+	ctx,cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+	log.Println("GetApplication service method called")
+
+	return s.repo.GetApplications(ctx)
 }

@@ -143,6 +143,20 @@ func (h *Handler) CreateApplication(c echo.Context) error {
 	return c.JSON(http.StatusCreated, app)
 }
 
+func (h *Handler) GetApplication(c echo.Context) error {
+	ctx := c.Request().Context()
+
+	fmt.Println("Recieved request")
+
+	err := h.service.GetApplication(ctx)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "failed to get applications")
+	}
+
+	return c.JSON(http.StatusOK, "success")
+}
+
 func validateCreateApplicationRequest(
 	req *createApplicationRequest,
 	proposal *multipart.FileHeader,

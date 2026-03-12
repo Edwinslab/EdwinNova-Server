@@ -4,9 +4,6 @@ import (
 	"context"
 	"fmt"
 	"mime/multipart"
-	"time"
-
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
@@ -55,23 +52,4 @@ func (s *S3Storage) UploadFile(
 	)
 
 	return url, nil
-}
-
-func (s *S3Storage) GenerateSignedURL(
-	ctx context.Context,
-	key string,
-) (string, error) {
-
-	presigner := s3.NewPresignClient(s.Client)
-
-	resp, err := presigner.PresignGetObject(ctx, &s3.GetObjectInput{
-		Bucket: aws.String(s.BucketName),
-		Key:    aws.String(key),
-	}, s3.WithPresignExpires(15*time.Minute))
-
-	if err != nil {
-		return "", err
-	}
-
-	return resp.URL, nil
 }

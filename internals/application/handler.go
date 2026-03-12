@@ -143,18 +143,61 @@ func (h *Handler) CreateApplication(c echo.Context) error {
 	return c.JSON(http.StatusCreated, app)
 }
 
-func (h *Handler) GetApplication(c echo.Context) error {
+func (h *Handler) ExportApplications(c echo.Context) error {
+
 	ctx := c.Request().Context()
 
-	fmt.Println("Recieved request")
-
-	err := h.service.GetApplication(ctx)
-
+	data, err := h.service.ExportApplications(ctx)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, "failed to get applications")
+		return c.JSON(http.StatusInternalServerError, map[string]string{
+			"error": err.Error(),
+		})
 	}
 
-	return c.JSON(http.StatusOK, "success")
+	c.Response().Header().Set(
+		"Content-Type",
+		"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+	)
+
+	c.Response().Header().Set(
+		"Content-Disposition",
+		"attachment; filename=applications.xlsx",
+	)
+
+	return c.Blob(
+		http.StatusOK,
+		"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+		data,
+	)
+}
+
+func (h *Handler) ExportApplicationsCSV(c echo.Context) error {
+
+	ctx := c.Request().Context()
+
+	data, err := h.service.ExportApplicationsCSV(ctx)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{
+			"error": err.Error(),
+		})
+	}
+
+	c.Response().Header().Set("Content-Type", "text/csv")
+	c.Response().Header().Set("Content-Disposition", "attachment; filename=applications.csv")
+
+	return c.Blob(http.StatusOK, "text/csv", data)
+}
+
+func (h *Handler) GetAllApplications(c echo.Context)error{
+	ctx := c.Request().Context()
+	
+	apps,err := h.service.GetAllApplications(ctx)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{
+			"error": err.Error(),
+		})
+	}
+	return c.JSON(http.StatusOK, apps)
 }
 
 func validateCreateApplicationRequest(

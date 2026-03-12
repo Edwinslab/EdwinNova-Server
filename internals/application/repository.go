@@ -10,7 +10,7 @@ import (
 
 type Repository interface {
 	Create(ctx context.Context, app *Application) error
-	GetApplications(ctx context.Context) error
+	GetAllApplications(ctx context.Context) ([]Application,error)
 }
 
 type repository struct {
@@ -32,29 +32,29 @@ func (r *repository) Create(ctx context.Context, app *Application) error {
 	return err
 }
 
-func (r *repository) GetApplications(ctx context.Context) error {
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+func (r repository) GetAllApplications(ctx context.Context)([]Application,error){
+	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
 
 	cursor,err := r.collection.Find(ctx,bson.M{})
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer cursor.Close(ctx)
-	
+
 	var applications []Application
 
 	for cursor.Next(ctx) {
 		var app Application
 		if err := cursor.Decode(&app); err != nil {
-			return err
+			return nil, err
 		}
 		applications = append(applications, app)
 	}
 
 	if err := cursor.Err(); err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return applications, nil
 }
